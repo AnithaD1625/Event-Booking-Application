@@ -1,14 +1,10 @@
 import React, { useState, useMemo } from 'react';
-import { Toaster } from 'react-hot-toast';
 import Header from './components/Header';
 import EventCard from './components/EventCard';
 import EventDetails from './components/EventDetails';
 import EventFilters from './components/EventFilters';
 import Footer from './components/Footer';
-import AuthModal from './components/AuthModal';
-import UserProfile from './components/UserProfile';
-import { useEvents } from './hooks/useEvents';
-import { useAuth } from './hooks/useAuth';
+import { events } from './data/events';
 import { Event } from './types/Event';
 
 function App() {
@@ -17,15 +13,10 @@ function App() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
-
-  const { events, loading, error } = useEvents();
-  const { loading: authLoading } = useAuth();
 
   const categories = useMemo(() => {
     return Array.from(new Set(events.map(event => event.category))).sort();
-  }, [events]);
+  }, []);
 
   const filteredEvents = useMemo(() => {
     return events.filter(event => {
@@ -38,7 +29,7 @@ function App() {
       
       return matchesSearch && matchesCategory && matchesPrice;
     });
-  }, [events, searchTerm, selectedCategory, priceRange]);
+  }, [searchTerm, selectedCategory, priceRange]);
 
   const selectedEvent = selectedEventId ? events.find(event => event.id === selectedEventId) : null;
 
@@ -78,34 +69,13 @@ function App() {
     );
   };
 
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (currentView === 'details' && selectedEvent) {
-    return (
-      <>
-        <EventDetails event={selectedEvent} onBack={handleBackToEvents} />
-        <Toaster position="top-right" />
-      </>
-    );
+    return <EventDetails event={selectedEvent} onBack={handleBackToEvents} />;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
-        currentView={currentView} 
-        onViewChange={setCurrentView}
-        onAuthModalOpen={() => setShowAuthModal(true)}
-        onProfileModalOpen={() => setShowProfileModal(true)}
-      />
+      <Header currentView={currentView} onViewChange={setCurrentView} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {currentView === 'events' && (
@@ -129,18 +99,7 @@ function App() {
               onPriceRangeChange={setPriceRange}
             />
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading events...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">⚠️</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Error loading events</h3>
-                <p className="text-gray-600">{error}</p>
-              </div>
-            ) : filteredEvents.length === 0 ? (
+            {filteredEvents.length === 0 ? (
               <div className="text-center py-12">
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">No events found</h3>
@@ -171,37 +130,12 @@ function App() {
               </p>
             </div>
 
-            {loading ? (
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading events...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">⚠️</div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Error loading events</h3>
-                <p className="text-gray-600">{error}</p>
-              </div>
-            ) : (
-              renderEventsByCategory()
-            )}
+            {renderEventsByCategory()}
           </>
         )}
       </main>
 
       <Footer />
-
-      <AuthModal 
-        isOpen={showAuthModal} 
-        onClose={() => setShowAuthModal(false)} 
-      />
-
-      <UserProfile 
-        isOpen={showProfileModal} 
-        onClose={() => setShowProfileModal(false)} 
-      />
-
-      <Toaster position="top-right" />
     </div>
   );
 }
