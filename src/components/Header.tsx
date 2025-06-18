@@ -1,25 +1,16 @@
 import React from 'react';
-import { Calendar, Menu, X, User, LogIn } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import { Calendar, Menu, X } from 'lucide-react';
 
 interface HeaderProps {
   currentView: string;
   onViewChange: (view: string) => void;
-  onAuthModalOpen: () => void;
-  onProfileModalOpen: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ 
-  currentView, 
-  onViewChange, 
-  onAuthModalOpen, 
-  onProfileModalOpen 
-}) => {
+const Header: React.FC<HeaderProps> = ({ currentView, onViewChange }) => {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
-  const { user } = useAuth();
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-40">
+    <header className="bg-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-3">
@@ -54,26 +45,6 @@ const Header: React.FC<HeaderProps> = ({
             </button>
           </nav>
 
-          <div className="hidden md:flex items-center space-x-4">
-            {user ? (
-              <button
-                onClick={onProfileModalOpen}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
-              >
-                <User className="h-4 w-4" />
-                <span>{user.user_metadata?.full_name || user.email}</span>
-              </button>
-            ) : (
-              <button
-                onClick={onAuthModalOpen}
-                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
-              >
-                <LogIn className="h-4 w-4" />
-                <span>Sign In</span>
-              </button>
-            )}
-          </div>
-
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 rounded-md text-gray-700 hover:text-blue-600 hover:bg-gray-50"
@@ -83,7 +54,7 @@ const Header: React.FC<HeaderProps> = ({
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden py-4 space-y-2 border-t">
+          <div className="md:hidden py-4 space-y-2">
             <button
               onClick={() => {
                 onViewChange('events');
@@ -110,32 +81,6 @@ const Header: React.FC<HeaderProps> = ({
             >
               Categories
             </button>
-            
-            <div className="pt-2 border-t">
-              {user ? (
-                <button
-                  onClick={() => {
-                    onProfileModalOpen();
-                    setIsMenuOpen(false);
-                  }}
-                  className="flex items-center space-x-2 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
-                >
-                  <User className="h-4 w-4" />
-                  <span>{user.user_metadata?.full_name || user.email}</span>
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    onAuthModalOpen();
-                    setIsMenuOpen(false);
-                  }}
-                  className="flex items-center space-x-2 w-full px-3 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span>Sign In</span>
-                </button>
-              )}
-            </div>
           </div>
         )}
       </div>
