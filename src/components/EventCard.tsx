@@ -29,13 +29,13 @@ const EventCard: React.FC<EventCardProps> = ({ event, onViewDetails }) => {
     });
   };
 
-  const availabilityColor = event.available_spots < 10 ? 'text-red-600' : 'text-green-600';
+  const availabilityColor = event.availableSpots < 10 ? 'text-red-600' : 'text-green-600';
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
       <div className="relative">
         <img
-          src={event.image_url}
+          src={event.image}
           alt={event.title}
           className="w-full h-48 object-cover"
         />
@@ -76,7 +76,7 @@ const EventCard: React.FC<EventCardProps> = ({ event, onViewDetails }) => {
           <div className="flex items-center text-sm">
             <Users className="h-4 w-4 mr-2 text-gray-600" />
             <span className={`font-medium ${availabilityColor}`}>
-              {event.available_spots} spots available
+              {event.availableSpots} spots available
             </span>
           </div>
         </div>
