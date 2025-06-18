@@ -32,17 +32,14 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onBack }) => {
     });
   };
 
-  const availabilityColor = event.available_spots < 10 ? 'text-red-600' : 'text-green-600';
+  const availabilityColor = event.availableSpots < 10 ? 'text-red-600' : 'text-green-600';
 
   if (showBookingForm) {
     return (
       <BookingForm
         event={event}
         onBack={() => setShowBookingForm(false)}
-        onBookingComplete={() => {
-          setShowBookingForm(false);
-          onBack();
-        }}
+        onBookingComplete={() => alert('Booking confirmed! Check your email for details.')}
       />
     );
   }
@@ -61,7 +58,7 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onBack }) => {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="relative">
             <img
-              src={event.image_url}
+              src={event.image}
               alt={event.title}
               className="w-full h-64 md:h-80 object-cover"
             />
@@ -158,14 +155,14 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onBack }) => {
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Available Spots</span>
                       <span className={`font-semibold ${availabilityColor}`}>
-                        {event.available_spots}
+                        {event.availableSpots}
                       </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-gradient-to-r from-blue-600 to-purple-600 h-2 rounded-full transition-all duration-300"
                         style={{
-                          width: `${((event.capacity - event.available_spots) / event.capacity) * 100}%`
+                          width: `${((event.capacity - event.availableSpots) / event.capacity) * 100}%`
                         }}
                       />
                     </div>
@@ -173,14 +170,14 @@ const EventDetails: React.FC<EventDetailsProps> = ({ event, onBack }) => {
 
                   <button
                     onClick={() => setShowBookingForm(true)}
-                    disabled={event.available_spots === 0}
+                    disabled={event.availableSpots === 0}
                     className={`w-full py-4 px-6 rounded-xl font-semibold text-lg transition-all duration-200 transform hover:scale-105 ${
-                      event.available_spots === 0
+                      event.availableSpots === 0
                         ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                         : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 shadow-lg hover:shadow-xl'
                     }`}
                   >
-                    {event.available_spots === 0 ? 'Sold Out' : 'Book Now'}
+                    {event.availableSpots === 0 ? 'Sold Out' : 'Book Now'}
                   </button>
 
                   <div className="mt-4 flex items-center justify-center text-sm text-gray-600">
