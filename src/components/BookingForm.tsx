@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowLeft, User, Mail, Phone, MessageSquare, CreditCard, Check } from 'lucide-react';
 import { Event, BookingDetails } from '../types/Event';
-import { useAuth } from '../hooks/useAuth';
-import { useBookings } from '../hooks/useBookings';
-import { useEvents } from '../hooks/useEvents';
-import toast from 'react-hot-toast';
 
 interface BookingFormProps {
   event: Event;
@@ -13,14 +9,10 @@ interface BookingFormProps {
 }
 
 const BookingForm: React.FC<BookingFormProps> = ({ event, onBack, onBookingComplete }) => {
-  const { user } = useAuth();
-  const { createBooking } = useBookings();
-  const { updateEventSpots } = useEvents();
-  
   const [bookingDetails, setBookingDetails] = useState<BookingDetails>({
     eventId: event.id,
-    attendeeName: user?.user_metadata?.full_name || '',
-    attendeeEmail: user?.email || '',
+    attendeeName: '',
+    attendeeEmail: '',
     attendeePhone: '',
     ticketQuantity: 1,
     specialRequests: ''
@@ -50,8 +42,8 @@ const BookingForm: React.FC<BookingFormProps> = ({ event, onBack, onBookingCompl
       newErrors.ticketQuantity = 'At least 1 ticket is required';
     }
 
-    if (bookingDetails.ticketQuantity > event.available_spots) {
-      newErrors.ticketQuantity = `Only ${event.available_spots} spots available`;
+    if (bookingDetails.ticketQuantity > event.availableSpots) {
+      newErrors.ticketQuantity = `Only ${event.availableSpots} spots available`;
     }
 
     setErrors(newErrors);
@@ -61,35 +53,17 @@ const BookingForm: React.FC<BookingFormProps> = ({ event, onBack, onBookingCompl
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!user) {
-      toast.error('Please sign in to book an event');
-      return;
-    }
-
     if (!validateForm()) {
       return;
     }
 
     setIsSubmitting(true);
     
-    try {
-      const totalAmount = bookingDetails.ticketQuantity * event.price;
-      
-      // Create booking
-      const { error: bookingError } = await createBooking(bookingDetails, totalAmount);
-      if (bookingError) throw new Error(bookingError);
-
-      // Update event available spots
-      const { error: updateError } = await updateEventSpots(event.id, bookingDetails.ticketQuantity);
-      if (updateError) throw new Error(updateError);
-
-      toast.success('Booking confirmed! Check your email for details.');
-      onBookingComplete();
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to create booking');
-    } finally {
-      setIsSubmitting(false);
-    }
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsSubmitting(false);
+    onBookingComplete();
   };
 
   const handleInputChange = (field: keyof BookingDetails, value: string | number) => {
@@ -108,23 +82,6 @@ const BookingForm: React.FC<BookingFormProps> = ({ event, onBack, onBookingCompl
   };
 
   const totalPrice = bookingDetails.ticketQuantity * event.price;
-
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Sign In Required</h2>
-          <p className="text-gray-600 mb-6">Please sign in to book this event.</p>
-          <button
-            onClick={onBack}
-            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -217,7 +174,7 @@ const BookingForm: React.FC<BookingFormProps> = ({ event, onBack, onBookingCompl
                         errors.ticketQuantity ? 'border-red-500' : 'border-gray-300'
                       }`}
                     >
-                      {Array.from({ length: Math.min(event.available_spots, 10) }, (_, i) => (
+                      {Array.from({ length: Math.min(event.availableSpots, 10) }, (_, i) => (
                         <option key={i + 1} value={i + 1}>
                           {i + 1} {i === 0 ? 'Ticket' : 'Tickets'}
                         </option>
